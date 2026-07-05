@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tyk-gateway
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: tyk
+  template:
+    metadata:
+      labels:
+        app: tyk
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              topologyKey: kubernetes.io/hostname
+              labelSelector:
+                matchLabels:
+                  app: tyk
+      containers:
+      - name: tyk
+        image: tykio/tyk-gateway:v5.5
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: TYK_GW_LOGLEVEL
+          value: info
+        volumeMounts:
+        - name: config
+          mountPath: /opt/tyk-gateway/tyk.conf
+          subPath: tyk.conf
+        readinessProbe:
+          httpGet:
+            path: /hello
+            port: 8080
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /hello
+            port: 8080
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          periodSeconds: 30
+        resources:
+          requests:
+            cpu: 250m
+            memory: 256Mi
+          limits:
+            cpu: "1"
+            memory: 1Gi
+      volumes:
+      - name: config
+        configMap:
+          name: tyk-config

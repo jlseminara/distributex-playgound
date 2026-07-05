@@ -1,0 +1,33 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgres-cluster
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.4
+  storage:
+    size: 10Gi
+    storageClass: standard
+  walStorage:
+    size: 5Gi
+  affinity:
+    enablePodAntiAffinity: true
+    topologyKey: kubernetes.io/hostname
+    podAntiAffinityType: preferred
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+  bootstrap:
+    initdb:
+      database: mydatabase
+      owner: myappuser
+      secret:
+        name: postgres-app-credentials
+  postgresql:
+    parameters:
+      shared_buffers: "256MB"
+      max_connections: "100"

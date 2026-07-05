@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tyk-config
+data:
+  tyk.conf: |
+    {
+      "listen_port":8080,
+      "secret":"SUPER_SECRET_CHANGE_ME",
+      "storage":{
+        "type":"redis",
+        "enable_cluster":true,
+        "hosts":[
+          "redis-cluster:6379"
+        ]
+      },
+      "enable_analytics":false,
+      "allow_insecure_configs":true,
+      "hash_keys":true,
+      "health_check":{
+        "enable_health_checks":true
+      },
+      "http_server_options":{
+        "enable_websockets":true
+      }
+    }
