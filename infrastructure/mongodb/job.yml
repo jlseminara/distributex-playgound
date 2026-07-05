@@ -1,0 +1,67 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init-rs
+spec:
+  backoffLimit: 10
+
+  template:
+    spec:
+      restartPolicy: OnFailure
+
+      containers:
+        - name: init-rs
+          image: mongo:7
+
+          command:
+            - /bin/bash
+            - -c
+            - |
+
+              echo "Esperando MongoDB..."
+
+              until mongosh --host mongodb-0.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
+              do
+                sleep 2
+              done
+
+              until mongosh --host mongodb-1.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
+              do
+                sleep 2
+              done
+
+              until mongosh --host mongodb-2.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
+              do
+                sleep 2
+              done
+
+              echo "MongoDB listo."
+
+              EXISTS=$(mongosh --host mongodb-0.mongodb:27017 --quiet --eval "try { rs.status().ok } catch(e) { print(0) }")
+
+              if [ "$EXISTS" = "1" ]; then
+                echo "ReplicaSet ya inicializado."
+                exit 0
+              fi
+
+              echo "Inicializando ReplicaSet..."
+
+              mongosh --host mongodb-0.mongodb:27017 <<EOF
+              rs.initiate({
+                _id: "rs0",
+                members: [
+                  {_id: 0, host: "mongodb-0.mongodb:27017"},
+                  {_id: 1, host: "mongodb-1.mongodb:27017"},
+                  {_id: 2, host: "mongodb-2.mongodb:27017"}
+                ]
+              })
+              EOF
+
+              echo "Esperando PRIMARY..."
+
+              until mongosh --host mongodb-0.mongodb:27017 --quiet --eval "rs.isMaster().ismaster" | grep true
+              do
+                sleep 2
+              done
+
+              echo "ReplicaSet creado correctamente."
