@@ -17,3 +17,8 @@ cd ..
 cd database-cluster
 ./remove-postgres.sh
 cd ..
+
+cd configuration-service
+./remove-configserver.sh
+cd ..
+

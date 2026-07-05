@@ -1,1 +1,1 @@
-kubectl apply -f ./consul-deployment.yml
+kubectl delete -f ./consul-deployment.yml
