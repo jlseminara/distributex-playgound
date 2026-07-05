@@ -1,0 +1,39 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq-cluster
+  # namespace: default  # o el namespace que prefieras
+spec:
+  replicas: 3                    # ← Redundancia de 3 pods (recomendado número impar)
+  
+  # Imagen con el plugin de management (recomendado)
+  image: rabbitmq:4-management
+  
+  # Recursos (ajusta según tu máquina local)
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1"
+      memory: "2Gi"
+  
+  # Persistencia (importante para no perder colas/mensajes)
+  persistence:
+    storageClassName: standard    # En local suele ser "standard" o "local-path"
+    storage: 5Gi                  # Ajusta según necesites
+  
+  # Service para acceso externo (Management UI + AMQP)
+  service:
+    type: ClusterIP               # Cambia a NodePort o LoadBalancer si quieres exponer fácil
+  
+  # Configuración adicional recomendada
+  rabbitmq:
+    additionalConfig: |
+      # Mejores prácticas para clustering
+      cluster_formation.peer_discovery_backend = k8s
+      cluster_partition_handling = autoheal
+      queue_master_locator = min-masters
+      # Credenciales por defecto (cámbialas en producción)
+      default_user = guest
+      default_pass = guest
