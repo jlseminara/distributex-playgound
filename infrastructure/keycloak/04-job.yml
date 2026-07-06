@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: keycloak-realm-setup
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kc-setup
+          image: quay.io/keycloak/keycloak:26.0
+          command:
+            - /bin/bash
+            - -c
+            - |
+              /opt/keycloak/bin/kcadm.sh config credentials \
+                --server http://keycloak:8080 \
+                --realm master \
+                --user $KEYCLOAK_ADMIN \
+                --password $KEYCLOAK_ADMIN_PASSWORD
+
+              /opt/keycloak/bin/kcadm.sh create realms -s realm=distributex -s enabled=true
+
+              /opt/keycloak/bin/kcadm.sh create users -r distributex -s username=testuser1 -s enabled=true
+              /opt/keycloak/bin/kcadm.sh set-password -r distributex --username testuser1 --new-password pass123
+              
+              /opt/keycloak/bin/kcadm.sh create users -r distributex -s username=testuser2 -s enabled=true
+              /opt/keycloak/bin/kcadm.sh set-password -r distributex --username testuser2 --new-password pass123
+              
+              /opt/keycloak/bin/kcadm.sh create users -r distributex -s username=testuser3 -s enabled=true
+              /opt/keycloak/bin/kcadm.sh set-password -r distributex --username testuser3 --new-password pass123
+          env:
+            - name: KEYCLOAK_ADMIN
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-admin-credentials
+                  key: KEYCLOAK_ADMIN
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-admin-credentials
+                  key: KEYCLOAK_ADMIN_PASSWORD

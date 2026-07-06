@@ -1,0 +1,11 @@
+# 01-pvc.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lgtm-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
