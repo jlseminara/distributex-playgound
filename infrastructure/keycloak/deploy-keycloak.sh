@@ -3,7 +3,7 @@ kubectl apply -f ./01-storage.yml
 kubectl wait --for=condition=Ready cluster/keycloak-db --timeout=120s
 
 kubectl apply -f ./02-deployment.yml
-kubectl wait --for=condition=Available deployment/keycloak --timeout=180s
+kubectl wait --for=condition=Available deployment/keycloak --timeout=240s
 
 kubectl apply -f ./03-service.yml
 

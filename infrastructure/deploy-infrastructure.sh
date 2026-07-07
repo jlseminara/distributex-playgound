@@ -18,4 +18,18 @@ cd database-cluster
 ./deploy-postgres.sh
 cd ..
 
+cd keycloak
+./deploy-keycloak.sh
+cd ..
 
+cd message-broker
+./deploy-rabbit.sh
+cd ..
+
+cd mongodbf
+./deploy-mongodb.sh
+cd ..
+
+cd observability
+./depploy-grafana.sh
+cd ..
