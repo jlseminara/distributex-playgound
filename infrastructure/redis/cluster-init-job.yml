@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: redis-cluster-init
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      restartPolicy: OnFailure
+      hostNetwork: true          # ← Aquí (nivel pod)
+      dnsPolicy: ClusterFirstWithHostNet  # ← Aquí (nivel pod)
+      containers:
+      - name: redis-init
+        image: redis:7.2
+        command:
+          - /bin/sh
+          - -c
+          - |
+            redis-cli --cluster create redis-0.redis-headless:6379 redis-1.redis-headless:6379 redis-2.redis-headless:6379 --cluster-replicas 0 --cluster-yes

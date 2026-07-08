@@ -5,22 +5,34 @@ metadata:
 data:
   tyk.conf: |
     {
-      "listen_port":8080,
-      "secret":"SUPER_SECRET_CHANGE_ME",
-      "storage":{
-        "type":"redis",
-        "enable_cluster":true,
-        "hosts":[
-          "redis-cluster:6379"
-        ]
+      "listen_port": 8080,
+      "secret": "SUPER_SECRET_CHANGE_ME",
+      "template_path": "/opt/tyk-gateway/templates",
+      "tyk_js_path": "/opt/tyk-gateway/js/tyk.js",
+      "middleware_path": "/opt/tyk-gateway/middleware",
+      "app_path": "/opt/tyk-gateway/apps/",
+      "policies": {
+        "policy_source": "file",
+        "policy_path": "/opt/tyk-gateway/policies"
       },
-      "enable_analytics":false,
-      "allow_insecure_configs":true,
-      "hash_keys":true,
-      "health_check":{
-        "enable_health_checks":true
+      "storage": {
+        "type": "redis",
+        "enable_cluster": true,
+        "addrs": [
+          "redis-0.redis-headless:6379",
+          "redis-1.redis-headless:6379",
+          "redis-2.redis-headless:6379"
+        ],
+        "username": "",
+        "password": "",
+        "database": 0,
+        "optimisation_max_idle": 2000,
+        "optimisation_max_active": 4000
       },
-      "http_server_options":{
-        "enable_websockets":true
+      "enable_analytics": false,
+      "allow_insecure_configs": true,
+      "hash_keys": true,
+      "http_server_options": {
+        "enable_websockets": true
       }
     }

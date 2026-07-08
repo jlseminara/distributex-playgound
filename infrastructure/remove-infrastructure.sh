@@ -33,3 +33,5 @@ cd ..
 cd observability
 ./remove-grafana.sh
 cd ..
+
+kubectl delete pvc --all
