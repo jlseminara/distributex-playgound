@@ -43,6 +43,9 @@ spec:
           httpGet:
             path: /
             port: 8081
+            httpHeaders:
+              - name: Authorization
+                value: Basic YWRtaW46YWRtaW4=
           failureThreshold: 30
           periodSeconds: 5
 
@@ -50,6 +53,9 @@ spec:
           httpGet:
             path: /
             port: 8081
+            httpHeaders:
+              - name: Authorization
+                value: Basic YWRtaW46YWRtaW4=
           initialDelaySeconds: 5
           periodSeconds: 10
 
@@ -57,5 +63,8 @@ spec:
           httpGet:
             path: /
             port: 8081
+            httpHeaders:
+              - name: Authorization
+                value: Basic YWRtaW46YWRtaW4=
           initialDelaySeconds: 60
           periodSeconds: 20
