@@ -26,7 +26,7 @@ cd message-broker
 ./deploy-rabbit.sh
 cd ..
 
-cd mongodbf
+cd mongodb
 ./deploy-mongodb.sh
 cd ..
 

@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: mongodb-init-rs
 spec:
-  backoffLimit: 10
+  backoffLimit: 3
 
   template:
     spec:
@@ -18,33 +18,10 @@ spec:
             - -c
             - |
 
-              echo "Esperando MongoDB..."
-
-              until mongosh --host mongodb-0.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
-              do
+              until getent hosts mongodb-0.mongodb mongodb-1.mongodb mongodb-2.mongodb; do
+                echo "Esperando DNS de los pods..."
                 sleep 2
               done
-
-              until mongosh --host mongodb-1.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
-              do
-                sleep 2
-              done
-
-              until mongosh --host mongodb-2.mongodb:27017 --quiet --eval "db.adminCommand('ping')" >/dev/null 2>&1
-              do
-                sleep 2
-              done
-
-              echo "MongoDB listo."
-
-              EXISTS=$(mongosh --host mongodb-0.mongodb:27017 --quiet --eval "try { rs.status().ok } catch(e) { print(0) }")
-
-              if [ "$EXISTS" = "1" ]; then
-                echo "ReplicaSet ya inicializado."
-                exit 0
-              fi
-
-              echo "Inicializando ReplicaSet..."
 
               mongosh --host mongodb-0.mongodb:27017 <<EOF
               rs.initiate({
@@ -59,7 +36,7 @@ spec:
 
               echo "Esperando PRIMARY..."
 
-              until mongosh --host mongodb-0.mongodb:27017 --quiet --eval "rs.isMaster().ismaster" | grep true
+              until mongosh --host mongodb-0.mongodb:27017 --quiet --eval "db.hello().isWritablePrimary" | grep true
               do
                 sleep 2
               done

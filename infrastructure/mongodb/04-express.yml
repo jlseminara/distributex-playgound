@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: mongo-express
-        image: mongo-express:1.0.2
+        image: mongo-express:latest
         imagePullPolicy: IfNotPresent
 
         ports:
@@ -39,16 +39,23 @@ spec:
               name: mongo-express-secret
               key: ME_CONFIG_BASICAUTH_PASSWORD
 
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8081
+          failureThreshold: 30
+          periodSeconds: 5
+
         readinessProbe:
           httpGet:
             path: /
             port: 8081
-          initialDelaySeconds: 10
-          periodSeconds: 5
+          initialDelaySeconds: 5
+          periodSeconds: 10
 
         livenessProbe:
           httpGet:
             path: /
             port: 8081
-          initialDelaySeconds: 20
-          periodSeconds: 10
+          initialDelaySeconds: 60
+          periodSeconds: 20

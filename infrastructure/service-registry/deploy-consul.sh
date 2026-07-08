@@ -1,3 +1,4 @@
 kubectl apply -f ./consul-deployment.yml
-kubectl get pods
-kubectl get svc
+
+kubectl rollout status statefulset/consul
+
